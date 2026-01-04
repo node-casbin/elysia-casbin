@@ -51,7 +51,8 @@ const defaultSubjectResolver = (context: any): string => {
   if (user && user.id) {
     return user.id;
   }
-  const userId = context.headers?.['x-user-id'];
+  const headers = context.headers || {};
+  const userId = headers['x-user-id'];
   return userId ? String(userId) : 'anonymous';
 };
 
