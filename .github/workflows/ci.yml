@@ -8,9 +8,14 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
@@ -31,6 +36,8 @@ jobs:
   test:
     needs: [lint]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         node: ['18', '20', '22']
@@ -54,6 +61,8 @@ jobs:
   coverage:
     needs: [lint]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
@@ -71,6 +80,10 @@ jobs:
   semantic-release:
     needs: [lint, test, coverage]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     if: github.repository == 'node-casbin/elysia-casbin' && github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
