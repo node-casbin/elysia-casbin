@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Elysia, type Context } from 'elysia';
+import { Elysia } from 'elysia';
 import { Enforcer } from 'casbin';
 
 export interface CasbinOptions {
@@ -25,45 +25,45 @@ export interface CasbinOptions {
    * Custom function to extract subject from request context
    * @default - Extracts from user.id or headers['x-user-id']
    */
-  subjectResolver?: (context: Context) => string | Promise<string>;
+  subjectResolver?: (context: any) => string | Promise<string>;
 
   /**
    * Custom function to extract object from request context
    * @default - Extracts from request path
    */
-  objectResolver?: (context: Context) => string | Promise<string>;
+  objectResolver?: (context: any) => string | Promise<string>;
 
   /**
    * Custom function to extract action from request context
    * @default - Extracts from request method
    */
-  actionResolver?: (context: Context) => string | Promise<string>;
+  actionResolver?: (context: any) => string | Promise<string>;
 
   /**
    * Custom unauthorized handler
    * @default - Returns 403 Forbidden
    */
-  unauthorizedHandler?: (context: Context) => any;
+  unauthorizedHandler?: (context: any) => any;
 }
 
-const defaultSubjectResolver = (context: Context): string => {
+const defaultSubjectResolver = (context: any): string => {
   const user = (context as any).user;
   if (user && user.id) {
     return user.id;
   }
-  const userId = context.headers['x-user-id'];
+  const userId = context.headers?.['x-user-id'];
   return userId ? String(userId) : 'anonymous';
 };
 
-const defaultObjectResolver = (context: Context): string => {
+const defaultObjectResolver = (context: any): string => {
   return context.path;
 };
 
-const defaultActionResolver = (context: Context): string => {
+const defaultActionResolver = (context: any): string => {
   return context.request.method;
 };
 
-const defaultUnauthorizedHandler = (context: Context) => {
+const defaultUnauthorizedHandler = (context: any) => {
   context.set.status = 403;
   return {
     error: 'Forbidden',
@@ -104,7 +104,7 @@ export const casbin = (options: CasbinOptions) => {
   return new Elysia({
     name: 'elysia-casbin',
     seed: options
-  }).onBeforeHandle(async (context: Context) => {
+  }).onBeforeHandle({ as: 'global' }, async (context) => {
     try {
       const subject = await subjectResolver(context);
       const object = await objectResolver(context);

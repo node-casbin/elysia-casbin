@@ -33,8 +33,7 @@ describe('Elysia Casbin Middleware', () => {
           enforcer,
           subjectResolver: () => 'alice'
         }))
-        .get('/data1', () => 'Success')
-        .listen(0);
+        .get('/data1', () => 'Success');
 
       const response = await app.handle(
         new Request('http://localhost/data1', {
@@ -45,8 +44,6 @@ describe('Elysia Casbin Middleware', () => {
       expect(response.status).toBe(200);
       const body = await response.text();
       expect(body).toBe('Success');
-
-      app.stop();
     });
 
     it('should deny unauthorized requests', async () => {
@@ -55,8 +52,7 @@ describe('Elysia Casbin Middleware', () => {
           enforcer,
           subjectResolver: () => 'bob'
         }))
-        .get('/data1', () => 'Success')
-        .listen(0);
+        .get('/data1', () => 'Success');
 
       const response = await app.handle(
         new Request('http://localhost/data1', {
@@ -67,8 +63,6 @@ describe('Elysia Casbin Middleware', () => {
       expect(response.status).toBe(403);
       const body = await response.json();
       expect(body.error).toBe('Forbidden');
-
-      app.stop();
     });
 
     it('should work with POST method', async () => {
@@ -77,8 +71,7 @@ describe('Elysia Casbin Middleware', () => {
           enforcer,
           subjectResolver: () => 'alice'
         }))
-        .post('/data1', () => 'Success')
-        .listen(0);
+        .post('/data1', () => 'Success');
 
       const response = await app.handle(
         new Request('http://localhost/data1', {
@@ -87,8 +80,6 @@ describe('Elysia Casbin Middleware', () => {
       );
 
       expect(response.status).toBe(200);
-
-      app.stop();
     });
 
     it('should deny unauthorized POST requests', async () => {
@@ -97,8 +88,7 @@ describe('Elysia Casbin Middleware', () => {
           enforcer,
           subjectResolver: () => 'bob'
         }))
-        .post('/data1', () => 'Success')
-        .listen(0);
+        .post('/data1', () => 'Success');
 
       const response = await app.handle(
         new Request('http://localhost/data1', {
@@ -107,8 +97,6 @@ describe('Elysia Casbin Middleware', () => {
       );
 
       expect(response.status).toBe(403);
-
-      app.stop();
     });
   });
 
@@ -119,8 +107,7 @@ describe('Elysia Casbin Middleware', () => {
           enforcer,
           subjectResolver: () => 'alice'
         }))
-        .get('/admin', () => 'Admin Panel')
-        .listen(0);
+        .get('/admin', () => 'Admin Panel');
 
       const response = await app.handle(
         new Request('http://localhost/admin', {
@@ -131,8 +118,6 @@ describe('Elysia Casbin Middleware', () => {
       expect(response.status).toBe(200);
       const body = await response.text();
       expect(body).toBe('Admin Panel');
-
-      app.stop();
     });
 
     it('should deny access to users without proper role', async () => {
@@ -141,8 +126,7 @@ describe('Elysia Casbin Middleware', () => {
           enforcer,
           subjectResolver: () => 'bob'
         }))
-        .get('/admin', () => 'Admin Panel')
-        .listen(0);
+        .get('/admin', () => 'Admin Panel');
 
       const response = await app.handle(
         new Request('http://localhost/admin', {
@@ -151,8 +135,6 @@ describe('Elysia Casbin Middleware', () => {
       );
 
       expect(response.status).toBe(403);
-
-      app.stop();
     });
   });
 
@@ -166,8 +148,7 @@ describe('Elysia Casbin Middleware', () => {
             return userId ? String(userId) : 'anonymous';
           }
         }))
-        .get('/data1', () => 'Success')
-        .listen(0);
+        .get('/data1', () => 'Success');
 
       const response = await app.handle(
         new Request('http://localhost/data1', {
@@ -177,8 +158,6 @@ describe('Elysia Casbin Middleware', () => {
       );
 
       expect(response.status).toBe(200);
-
-      app.stop();
     });
 
     it('should use custom object resolver', async () => {
@@ -190,8 +169,7 @@ describe('Elysia Casbin Middleware', () => {
             return '/data1';
           }
         }))
-        .get('/some-other-path', () => 'Success')
-        .listen(0);
+        .get('/some-other-path', () => 'Success');
 
       const response = await app.handle(
         new Request('http://localhost/some-other-path', {
@@ -200,8 +178,6 @@ describe('Elysia Casbin Middleware', () => {
       );
 
       expect(response.status).toBe(200);
-
-      app.stop();
     });
 
     it('should use custom action resolver', async () => {
@@ -211,8 +187,7 @@ describe('Elysia Casbin Middleware', () => {
           subjectResolver: () => 'alice',
           actionResolver: () => 'GET'
         }))
-        .post('/data1', () => 'Success')
-        .listen(0);
+        .post('/data1', () => 'Success');
 
       const response = await app.handle(
         new Request('http://localhost/data1', {
@@ -221,8 +196,6 @@ describe('Elysia Casbin Middleware', () => {
       );
 
       expect(response.status).toBe(200);
-
-      app.stop();
     });
 
     it('should use custom unauthorized handler', async () => {
@@ -235,8 +208,7 @@ describe('Elysia Casbin Middleware', () => {
             return { custom: 'error', message: 'Custom unauthorized' };
           }
         }))
-        .get('/data1', () => 'Success')
-        .listen(0);
+        .get('/data1', () => 'Success');
 
       const response = await app.handle(
         new Request('http://localhost/data1', {
@@ -248,8 +220,6 @@ describe('Elysia Casbin Middleware', () => {
       const body = await response.json();
       expect(body.custom).toBe('error');
       expect(body.message).toBe('Custom unauthorized');
-
-      app.stop();
     });
   });
 
@@ -265,8 +235,7 @@ describe('Elysia Casbin Middleware', () => {
     it('should use default subject resolver from x-user-id header', async () => {
       const app = new Elysia()
         .use(casbin({ enforcer }))
-        .get('/data1', () => 'Success')
-        .listen(0);
+        .get('/data1', () => 'Success');
 
       const response = await app.handle(
         new Request('http://localhost/data1', {
@@ -276,15 +245,12 @@ describe('Elysia Casbin Middleware', () => {
       );
 
       expect(response.status).toBe(200);
-
-      app.stop();
     });
 
     it('should use anonymous as default subject when no user info is available', async () => {
       const app = new Elysia()
         .use(casbin({ enforcer }))
-        .get('/data1', () => 'Success')
-        .listen(0);
+        .get('/data1', () => 'Success');
 
       const response = await app.handle(
         new Request('http://localhost/data1', {
@@ -293,8 +259,6 @@ describe('Elysia Casbin Middleware', () => {
       );
 
       expect(response.status).toBe(403);
-
-      app.stop();
     });
   });
 });
